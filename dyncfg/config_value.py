@@ -3,6 +3,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+
 class ConfigValue(str):
     """A subclass of str that provides additional methods for type conversion and default handling.
 
@@ -64,3 +65,21 @@ class ConfigValue(str):
         val = Path(self)
 
         return val
+
+    def as_list(self, separator: str = ",") -> "ConfigValueList":
+        """
+        Convert the string value into a ConfigValueList by splitting on the given separator.
+
+        Args:
+            separator (str): The delimiter to use for splitting the string. Defaults to a comma.
+
+        Returns:
+            ConfigValueList: A list-like wrapper of ConfigValue objects.
+        """
+        from config_value_list import ConfigValueList
+
+        values = [
+            ConfigValue(item.strip(), self.parent, self.section, self.key)
+            for item in self.split(separator)
+        ]
+        return ConfigValueList(values)
