@@ -59,7 +59,7 @@ class ConfigValue(str):
             return False
         return default
 
-    def as_path(self) -> str:
+    def as_path(self) -> Path:
         """Convert the value to a path"""
         val = Path(self)
 
