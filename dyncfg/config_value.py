@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -57,3 +58,9 @@ class ConfigValue(str):
         elif val in ("false", "no", "0"):
             return False
         return default
+
+    def as_path(self) -> str:
+        """Convert the value to a path"""
+        val = Path(self)
+
+        return val
