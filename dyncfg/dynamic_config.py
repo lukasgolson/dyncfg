@@ -3,7 +3,7 @@ import os
 import threading
 import logging
 
-from dynamicConfig.section import Section
+from dyncfg.section import Section
 
 logger = logging.getLogger(__name__)
 

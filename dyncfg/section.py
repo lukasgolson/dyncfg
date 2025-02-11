@@ -1,4 +1,4 @@
-from dynamicConfig.config_value import ConfigValue
+from dyncfg.config_value import ConfigValue
 import logging
 
 logger = logging.getLogger(__name__)
