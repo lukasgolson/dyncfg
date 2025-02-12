@@ -1,40 +1,38 @@
+from typing import Any, Callable, List, Union, TypeVar, Generic, Iterator
+
+T = TypeVar('T')
 
 
-class ConfigValueList:
-    """A wrapper for a list of ConfigValue objects that supports method chaining.
+class ConfigValueList(Generic[T]):
+    """A wrapper for a list of items (typically ConfigValue objects) that supports method chaining."""
 
-    This class allows you to call methods on each element in the list in a chainable way.
-    """
-
-    def __init__(self, values):
+    def __init__(self, values: List[T]) -> None:
         self.values = list(values)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[T]:
         return iter(self.values)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> T:
         return self.values[index]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"ConfigValueList({self.values!r})"
 
-    def __getattr__(self, name):
-        """Dynamically delegate attribute access to each ConfigValue in the list.
-
-        If the invoked method returns a ConfigValue for every element, wrap the
-        results in a new ConfigValueList for further chaining. Otherwise, return a list
-        of results.
+    def __getattr__(self, name: str) -> Callable[..., Union["ConfigValueList[T]", List[Any]]]:
         """
+        Dynamically delegate attribute access to each element in the list.
 
-        from dyncfg import ConfigValue
+        If the delegated call returns a ConfigValue for every element,
+        wrap the results in a new ConfigValueList (to allow method chaining);
+        otherwise, return a list of results.
+        """
+        from dyncfg import ConfigValue  # Assuming ConfigValue is defined in dyncfg
 
-        def method(*args, **kwargs):
-
+        def method(*args: Any, **kwargs: Any) -> Union["ConfigValueList[T]", List[Any]]:
             results = [getattr(value, name)(*args, **kwargs) for value in self.values]
-            # If all results are instances of ConfigValue, allow chaining.
             if all(isinstance(result, ConfigValue) for result in results):
                 return ConfigValueList(results)
             else:
-                return results  # Otherwise, simply return the list of results.
+                return results
 
         return method

@@ -1,10 +1,10 @@
 import functools
 import logging
 from pathlib import Path
+from typing import Callable, Union, TypeVar
 
 from dyncfg.config_value_list import ConfigValueList
 
-from typing import Callable, Union, TypeVar, Any
 try:
     from typing import ParamSpec
 except ImportError:

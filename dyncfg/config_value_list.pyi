@@ -1,5 +1,12 @@
-from typing import Any, Callable, Iterator, List, Union
+from pathlib import Path
+from typing import Any, Callable, Iterator, List, Union, TypeVar
 from dyncfg import ConfigValue
+
+try:
+    from typing import ParamSpec
+except ImportError:
+    from typing_extensions import ParamSpec
+
 
 
 class ConfigValueList:
@@ -19,3 +26,17 @@ class ConfigValueList:
     def __repr__(self) -> str: ...
 
     def __getattr__(self, name: str) -> Callable[..., Union["ConfigValueList", List[Any]]]: ...
+
+    def as_int(self, default: int=0) -> List[int]: ...
+
+    def as_float(self, default: float=0.0) -> List[float]: ...
+
+    def as_bool(self, default: bool=False) -> List[bool]: ...
+
+    def as_path(self) -> List[Path]: ...
+
+    P = ParamSpec('P')
+    R = TypeVar('R')
+
+    def apply(self, function: Callable[[Union[str, "ConfigValue"], *P.args], R], *args: P.args,
+            **kwargs: P.kwargs) -> List[Union["ConfigValue", R]]: ...
