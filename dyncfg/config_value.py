@@ -4,6 +4,12 @@ from pathlib import Path
 
 from dyncfg.config_value_list import ConfigValueList
 
+from typing import Callable, Union, TypeVar, Any
+try:
+    from typing import ParamSpec
+except ImportError:
+    from typing_extensions import ParamSpec
+
 logger = logging.getLogger(__name__)
 
 
@@ -127,3 +133,13 @@ class ConfigValue(str):
             for item in self.split(separator)
         ]
         return ConfigValueList(values)
+
+    P = ParamSpec('P')
+    R = TypeVar('R')
+
+    def call_function(self, function: Callable[[Union[str, "ConfigValue"], *P.args], R], *args: P.args,
+            **kwargs: P.kwargs) -> Union["ConfigValue", R]:
+        result = function(self, *args, **kwargs)
+        if isinstance(result, str):
+            return self._with_context(result)
+        return result
