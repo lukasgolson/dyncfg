@@ -1,5 +1,8 @@
+import functools
 import logging
 from pathlib import Path
+
+from dyncfg.config_value_list import ConfigValueList
 
 logger = logging.getLogger(__name__)
 
@@ -13,12 +16,54 @@ class ConfigValue(str):
         key (str): The key name in the section.
     """
 
-    def __new__(cls, value: str, parent=None, section: str = None, key: str = None):
+    def __new__(cls, value: str, parent=None, section: str = None, key: str = None) -> "ConfigValue":
         obj = super(ConfigValue, cls).__new__(cls, value)
         obj.parent = parent
         obj.section = section
         obj.key = key
+
+        obj._wrapped_cache = {}
         return obj
+
+        return obj
+
+    def _with_context(self, value: str) -> "ConfigValue":
+        """
+        Helper method to create a new ConfigValue with the same context.
+        """
+        return ConfigValue(value, self.parent, self.section, self.key)
+
+    def __getattribute__(self, name):
+        """
+        Intercept attribute access to dynamically wrap any string method that returns a string
+        with the same context. This version caches the wrapped methods to optimise performance.
+        """
+        # Bypass wrapping for special dunder attributes for safety and performance.
+        if name.startswith("__") and name.endswith("__"):
+            return super().__getattribute__(name)
+
+        # Retrieve the cache of wrapped methods.
+        _wrapped_cache = super().__getattribute__("_wrapped_cache")
+        if name in _wrapped_cache:
+            return _wrapped_cache[name]
+
+        attr = super().__getattribute__(name)
+        # Check if the attribute is callable and exists on the base str type.
+        if callable(attr) and hasattr(str, name):
+            @functools.wraps(attr)
+            def wrapper(*args, **kwargs):
+                result = attr(*args, **kwargs)
+                if isinstance(result, str):
+                    return self._with_context(result)
+                return result
+
+            # Cache the wrapped method for future accesses.
+            _wrapped_cache[name] = wrapper
+            return wrapper
+
+        return attr
+
+
 
     def or_default(self, default_value, update: bool = True) -> "ConfigValue":
         """Return the value if non-empty; otherwise, return and optionally update with default_value."""
@@ -76,7 +121,6 @@ class ConfigValue(str):
         Returns:
             ConfigValueList: A list-like wrapper of ConfigValue objects.
         """
-        from config_value_list import ConfigValueList
 
         values = [
             ConfigValue(item.strip(), self.parent, self.section, self.key)

@@ -11,7 +11,7 @@ long_description = (this_directory / "readme.md").read_text(encoding="utf-8")
 
 setup(
     name="dyncfg",
-    version="0.3.0",
+    version="0.3.1",
     author="Lukas G. Olson",
     author_email="olson@student.ubc.ca",
     description="A dynamic, easy-to-use .ini configuration system built for humans.",

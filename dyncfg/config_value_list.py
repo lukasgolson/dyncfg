@@ -1,4 +1,3 @@
-from dyncfg import ConfigValue
 
 
 class ConfigValueList:
@@ -27,7 +26,10 @@ class ConfigValueList:
         of results.
         """
 
+        from dyncfg import ConfigValue
+
         def method(*args, **kwargs):
+
             results = [getattr(value, name)(*args, **kwargs) for value in self.values]
             # If all results are instances of ConfigValue, allow chaining.
             if all(isinstance(result, ConfigValue) for result in results):
