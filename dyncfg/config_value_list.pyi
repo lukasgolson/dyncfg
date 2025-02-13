@@ -39,8 +39,6 @@ class ConfigValueList:
 
     def as_path(self) -> List[Path]: ...
 
-    P = ParamSpec('P')
     R = TypeVar('R')
 
-    def apply(self, function: Callable[[Union[str, "ConfigValue"], *P.args], R], *args: P.args,
-            **kwargs: P.kwargs) -> List[Union["ConfigValue", R]]: ...
+    def apply(self, function: Callable[..., R], *args, **kwargs) -> List[Union[ConfigValue, R]]: ...

@@ -134,27 +134,23 @@ class ConfigValue(str):
         ]
         return ConfigValueList(values)
 
-    P = ParamSpec('P')
     R = TypeVar('R')
 
-    def apply(self, function: Callable[[Union[str, "ConfigValue"], *P.args], R], *args: P.args,
-            **kwargs: P.kwargs) -> Union["ConfigValue", R]:
-
+    def apply(self, function: Callable[..., R], *args, **kwargs) -> Union["ConfigValue", R]:
         """
-          Call a function using this ConfigValue as the first argument.
+        Call a function using this ConfigValue as the first argument.
 
-          If the function returns a string, it is wrapped in a new ConfigValue with the same context.
+        If the function returns a string, it is wrapped in a new ConfigValue with the same context.
 
-          Args:
-              function (Callable[[Union[str, ConfigValue], *P.args], R]):
-                  A function that takes this ConfigValue (or its string form) as its first parameter.
-              *args: Additional positional arguments to pass to the function.
-              **kwargs: Additional keyword arguments to pass to the function.
+        Args:
+            function (Callable[..., R]):
+                A function that takes this ConfigValue (or its string form) as its first parameter.
+            *args: Additional positional arguments to pass to the function.
+            **kwargs: Additional keyword arguments to pass to the function.
 
-          Returns:
-              Union[ConfigValue, R]: A ConfigValue if the result is a string; otherwise, the raw result.
-       """
-
+        Returns:
+            Union[ConfigValue, R]: A ConfigValue if the result is a string; otherwise, the raw result.
+        """
         result = function(self, *args, **kwargs)
         if isinstance(result, str):
             return self._with_context(result)
