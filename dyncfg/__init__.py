@@ -9,4 +9,4 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 from .dynamic_config import DynamicConfig
 from .config_value import ConfigValue
-
+from .config_value_list import ConfigValueList

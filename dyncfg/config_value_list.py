@@ -12,8 +12,12 @@ class ConfigValueList(Generic[T]):
     def __iter__(self) -> Iterator[T]:
         return iter(self.values)
 
-    def __getitem__(self, index: int) -> T:
-        return self.values[index]
+    def __getitem__(self, index: Union[int, slice]) -> Union["ConfigValue", "ConfigValueList"]:
+
+        result = self.values[index]
+        if isinstance(index, slice):
+            return ConfigValueList(result)
+        return result
 
     def __repr__(self) -> str:
         return f"ConfigValueList({self.values!r})"

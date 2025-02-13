@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Iterator, List, Union, TypeVar
+from typing import Any, Callable, Iterator, List, Union, TypeVar, overload
 from dyncfg import ConfigValue
 
 try:
@@ -21,7 +21,11 @@ class ConfigValueList:
 
     def __iter__(self) -> Iterator[ConfigValue]: ...
 
-    def __getitem__(self, index: Union[int, slice]) -> Union[ConfigValue, List[ConfigValue]]: ...
+    @overload
+    def __getitem__(self, index: int) -> ConfigValue: ...
+
+    @overload
+    def __getitem__(self, index: slice) -> "ConfigValueList": ...
 
     def __repr__(self) -> str: ...
 
