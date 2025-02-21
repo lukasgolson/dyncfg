@@ -2,6 +2,8 @@ import configparser
 import os
 import threading
 import logging
+from pathlib import Path
+from typing import Union
 
 from dyncfg.section import Section
 
@@ -10,8 +12,8 @@ logger = logging.getLogger(__name__)
 class DynamicConfig:
     """A class to manage dynamic configuration settings using an INI file."""
 
-    def __init__(self, filename: str, default_section: str = "Default", auto_write: bool = True):
-        self.filename = filename
+    def __init__(self, filename: Union[str | Path], default_section: str = "Default", auto_write: bool = True):
+        self.filename = Path(filename).resolve(strict=True)
         self.default_section = default_section
         self.auto_write = auto_write  # Determines if changes are written immediately.
         self.config = configparser.ConfigParser()

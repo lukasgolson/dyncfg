@@ -93,6 +93,7 @@ class ConfigValue(str):
         try:
             return int(self)
         except ValueError:
+            logger.error(f"Error converting '{self}' to an integer")
             return default
 
     def as_float(self, default: float = 0.0) -> float:
@@ -100,6 +101,7 @@ class ConfigValue(str):
         try:
             return float(self)
         except ValueError:
+            logger.error(f"Error converting '{self}' to a float")
             return default
 
     def as_bool(self, default: bool = False) -> bool:
@@ -109,6 +111,7 @@ class ConfigValue(str):
             return True
         elif val in ("false", "no", "0"):
             return False
+        logger.error(f"Error converting '{self}' to a boolean")
         return default
 
     def as_path(self) -> Path:
