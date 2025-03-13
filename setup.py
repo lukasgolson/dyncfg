@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 
-
 from pathlib import Path
 
 # Get the directory where the current file (setup.py) is located
@@ -8,10 +7,9 @@ this_directory = Path(__file__).parent
 
 long_description = (this_directory / "readme.md").read_text(encoding="utf-8")
 
-
 setup(
     name="dyncfg",
-    version="0.4.4",
+    version="0.4.6",
     author="Lukas G. Olson",
     author_email="olson@student.ubc.ca",
     description="A dynamic, easy-to-use .ini configuration system built for humans.",
@@ -25,4 +23,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    extras_require={
+        "pandas": ["pandas"]
+    }
 )

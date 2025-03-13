@@ -13,7 +13,7 @@ class DynamicConfig:
     """A class to manage dynamic configuration settings using an INI file."""
 
     def __init__(self, filename: Union[str | Path], default_section: str = "Default", auto_write: bool = True):
-        self.filename = Path(filename).resolve(strict=True)
+        self.filename = Path(filename).resolve(strict=False)
         self.default_section = default_section
         self.auto_write = auto_write  # Determines if changes are written immediately.
         self.config = configparser.ConfigParser()
@@ -27,7 +27,7 @@ class DynamicConfig:
                     self.config.read(self.filename, encoding="utf-8")
                 else:
                     # Create an empty file if it does not exist.
-                    with open(self.filename, "w", encoding="utf-8") as f:
+                    with open(self.filename, "w", encoding="utf-8"):
                         pass
             except Exception as e:
                 logger.error(f"Error reading config file '{self.filename}': {e}")

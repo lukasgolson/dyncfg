@@ -158,3 +158,24 @@ class ConfigValue(str):
         if isinstance(result, str):
             return self._with_context(result)
         return result
+
+
+
+    try:
+        import pandas as pd
+        from dyncfg import pandas_extension
+
+        def as_table(self) -> pd.DataFrame:
+            """
+            Read a table from a file, automatically detecting the file type.
+
+            Returns:
+                pandas.DataFrame: The DataFrame read from the file, or None if an error occurs.
+            """
+            # Ignore the type error here because the pandas_extension module is only imported if pandas is available.
+            # noinspection PyUnresolvedReferences
+            return pandas_extension.read_table_auto(self)
+
+    except ImportError:
+        logger.debug("Pandas not found. Skipping pandas extension.")
+        pass
