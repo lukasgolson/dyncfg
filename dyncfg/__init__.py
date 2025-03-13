@@ -10,3 +10,9 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 from .dynamic_config import DynamicConfig
 from .config_value import ConfigValue
 from .config_value_list import ConfigValueList
+
+
+try:
+    from .pandas_extension import read_df_auto
+except ImportError:
+    pass

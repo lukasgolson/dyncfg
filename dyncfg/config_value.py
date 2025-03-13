@@ -1,5 +1,6 @@
 import functools
 import logging
+import os
 from pathlib import Path
 from typing import Callable, Union, TypeVar
 
@@ -159,22 +160,56 @@ class ConfigValue(str):
             return self._with_context(result)
         return result
 
-
-
     try:
         import pandas as pd
-        from dyncfg import pandas_extension
 
-        def as_table(self) -> pd.DataFrame:
+        def as_df(self, file_type_override=None, **kwargs) -> pd.DataFrame:
+            import pandas as pd
+
             """
-            Read a table from a file, automatically detecting the file type.
+            Read a pandas dataframe from a file, automatically detecting the file type,
+            or using an override if provided.
+
+            Args:
+                file_type_override (str, optional): An explicit file type (e.g., 'csv', 'excel', 'json'). Defaults to None.
+                **kwargs: Additional arguments to pass to the pandas read function.
 
             Returns:
                 pandas.DataFrame: The DataFrame read from the file, or None if an error occurs.
             """
-            # Ignore the type error here because the pandas_extension module is only imported if pandas is available.
-            # noinspection PyUnresolvedReferences
-            return pandas_extension.read_table_auto(self)
+
+            filepath = str(self.as_path().resolve())
+
+            if file_type_override:
+                file_type = file_type_override.lower()
+            else:
+                _, file_extension = os.path.splitext(filepath)
+                file_type = file_extension[1:].lower()  # Remove the leading dot
+
+            try:
+                if file_type == 'csv':
+                    return pd.read_csv(filepath, **kwargs)
+                elif file_type == 'xlsx' or file_type == 'xls':
+                    return pd.read_excel(filepath, **kwargs)
+                elif file_type == 'tsv' or file_type == 'txt':
+                    kwargs.setdefault('sep', '\t')
+                    return pd.read_csv(filepath, **kwargs)
+                elif file_type == 'json':
+                    return pd.read_json(filepath, **kwargs)
+                elif file_type == 'parquet':
+                    return pd.read_parquet(filepath, **kwargs)
+                elif file_type == 'feather':
+                    return pd.read_feather(filepath, **kwargs)
+                elif file_type == 'hdf' or file_type == 'h5':
+                    return pd.read_hdf(filepath, **kwargs)
+                elif file_type == 'pkl' or file_type == 'pickle':
+                    return pd.read_pickle(filepath, **kwargs)
+                else:
+                    print(f"Unsupported file type: {file_type}")
+                    return None
+            except Exception as e:
+                print(f"Error reading file: {e}")
+                return None
 
     except ImportError:
         logger.debug("Pandas not found. Skipping pandas extension.")
