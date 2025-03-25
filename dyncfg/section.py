@@ -11,7 +11,15 @@ class Section:
         self.name = name
 
     def __getattr__(self, key: str) -> ConfigValue:
-        """Retrieve a configuration value. If the key does not exist, create it with an empty value."""
+        """Retrieve a configuration value. If the key does not exist, create it with an empty value.
+
+        This now supports temporary overrides.
+        """
+        # Check for temporary override
+        override = self.parent._get_override(self.name, key)
+        if override is not None:
+            return ConfigValue(str(override), self.parent, self.name, key)
+
         with self.parent._lock:
             if self.parent.config.has_option(self.name, key):
                 value = self.parent.config.get(self.name, key)
